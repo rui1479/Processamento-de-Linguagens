@@ -2,6 +2,49 @@ import ply.yacc as yacc
 from lex import tokens
 
 
+functions = {}
+
+# Define grammar rules
+def p_statement_function(p):
+    '''
+    statement : FUNCTION_DEFINITION
+              | expression
+    '''
+    p[0] = p[1]
+
+def p_function_definition(p):
+    'FUNCTION_DEFINITION : COLON WORD LPAREN FUNCTION_PARAMS RPAREN FUNCTION_BODY'
+
+    function_name = p[2]
+    function_params = p[4]
+    function_body = p[6]
+
+    functions[function_name] = (function_params, function_body)
+    
+def p_function_params(p):
+    '''FUNCTION_PARAMS : ID FUNCTION_PARAMS
+                      | ID MINUS MINUS WORD
+                      '''
+    if len(p) == 2:
+        p[0] = [p[1]] 
+    elif len(p) == 5:
+        p[0] = [p[1]] + [p[4]]
+
+
+
+def p_function_body(p):
+    '''FUNCTION_BODY : operator expression operator SEMICOLON'''
+    p[0] = p[1] + p[2] + p[3]
+
+
+
+def p_operator(p):
+    '''operator : PLUS
+                | MINUS
+                | TIMES
+                | DIVIDE'''
+    p[0] = p[1]
+
 # Define grammar rules
 def p_expression_plus(p):
     'expression : expression expression PLUS'

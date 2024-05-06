@@ -14,11 +14,10 @@ tokens = (
     'SEMICOLON',
     'WORD',
     'ID',
-    'PRINT_S',
     'DOT',
     'MIDFUNC',
-    'EMIT',
-    'INT'
+    'QUOTE',
+    'EMIT'
 )
 
 t_RPAREN = r'\)'
@@ -29,6 +28,7 @@ t_COLON = r':'
 t_SEMICOLON = r';'
 t_DOT = r'\.'
 t_MINUS = r'\-'
+t_QUOTE = r'\"'
 
 parameter_list = False
 
@@ -65,17 +65,6 @@ def t_MIDFUNC(t):
 
 def t_EMIT(t):
     r'EMIT'
-    return t
-
-def t_INT(t):
-    r'INT'
-    return t
-
-
-def t_PRINT_S(t):
-    r'\." [a-zA-Z0-9_ ]*"'
-    #remover o ponto e as aspas
-    t.value = t.value[2:-1]
     return t
 
 

@@ -14,7 +14,6 @@ tokens = (
     'SEMICOLON',
     'WORD',
     'ID',
-    'PRINT_S',
     'DOT',
     'MIDFUNC',
     'QUOTE',
@@ -69,13 +68,6 @@ def t_MIDFUNC(t):
     r'\-{2}'
     global parameter_list
     parameter_list = False
-    return t
-
-
-def t_PRINT_S(t):
-    r'\." [a-zA-Z0-9_ ]*"'
-    # remover o ponto e as aspas
-    t.value = t.value[2:-1]
     return t
 
 

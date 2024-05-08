@@ -89,7 +89,7 @@ def p_instructions3(p):
     instruction = ''
     function_name = p[3]
     x = count_number(tokens)
-   
+    
     if isinstance(p[2], int):
         instruction += "pushi " + str(p[2]) + "\n"
     else:
@@ -121,9 +121,8 @@ def p_instructions3(p):
         instruction += instr + '\n'
     instruction += 'return\n'
 
-                
+            
     p[0] = instruction
-
 
 
 
@@ -131,7 +130,7 @@ def p_instructions3(p):
 def p_instructions4(p):
     'instructions : FUNCTION_DEFINITION'
     p[0] = p[1]
-
+    
 
 def p_instruction_number(p):
     'instruction : NUMBER'

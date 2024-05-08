@@ -16,7 +16,10 @@ tokens = (
     'ID',
     'PRINT_S',
     'DOT',
-    'MIDFUNC'
+    'MIDFUNC',
+    'QUOTE',
+    'EMIT',
+
 )
 
 t_MINUS = r'-'
@@ -27,6 +30,7 @@ t_PLUS = r'\+'
 t_COLON = r':'
 t_SEMICOLON = r';'
 t_DOT = r'\.'
+t_QUOTE = r'"'
 
 
 parameter_list = False
@@ -95,18 +99,24 @@ def count_id(tokens):
             count += 1
     return count
 
+def count_number(tokens):
+    count = 0
+    for token in tokens:
+        if token.type == 'NUMBER':
+            count += 1
+    return count
 
 lexer = lex.lex()
 
 
-def lexer_debug(example):
-    lexer.input(example)
-    tokens = []
-    while token := lexer.token():
-        print(token)
-        tokens.append(token)
-    print(count_id(tokens))
+# def lexer_debug(example):
+#     lexer.input(example)
+#     tokens = []
+#     while token := lexer.token():
+#         print(token)
+#         tokens.append(token)
+#     print(count_id(tokens))
 
 
-exemplo = ": AVERAGE ( a b -- avg ) + 2/ ;"
-lexer_debug(exemplo)
+# exemplo = ": AVERAGE ( a b -- avg ) + 2/ ;"
+# lexer_debug(exemplo)

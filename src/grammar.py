@@ -9,6 +9,7 @@ instructions : instructions instruction
              | instructions instruction WORD
              | FUNCTION_DEFINITION
              | WORD
+             | CONDICIONAL
 
 instruction : NUMBER
             | operator
@@ -17,7 +18,22 @@ instruction : NUMBER
 'FUNCTION_DEFINITION : COLON WORD LPAREN FUNCTION_PARAMS RPAREN FUNCTION_BODY SEMICOLON'
                      | COLON WORD PRINTFUNC SEMICOLON
 
-PRINTFUNC : DOT QUOTE WORD QUOTE
+FUNCTION_PARAMS : PARAMS FUNCTION_PARAMS
+                | PARAMS MIDFUNC WORD
+                | ID
+                
+FUNCTION_BODY : instructions
+                | instruction
+                                
+                       
+CONDICIONAL : 
+
+PRINTFUNC : DOT QUOTE words QUOTE
+
+words : words WORD
+        | WORD
+        | words WORD sinais
+
 
 'FUNCTION_PARAMS' : FUNCTION_PARAMS PARAMS 
                     | PARAMS MIDFUNC WORD
@@ -125,12 +141,13 @@ def p_instructions3(p):
     p[0] = instruction
 
 
-
-
 def p_instructions4(p):
     'instructions : FUNCTION_DEFINITION'
     p[0] = p[1]
     
+def p_instructions5(p):
+    'instructions : CONDICIONAL'
+    p[0] = p[1]
 
 def p_instruction_number(p):
     'instruction : NUMBER'
@@ -181,7 +198,6 @@ def p_function_definition1(p):
     p[0] = ''
 
 
-
 def p_function_params1(p):
     'FUNCTION_PARAMS : PARAMS FUNCTION_PARAMS '
 
@@ -212,12 +228,14 @@ def p_params_word(p):
 
 def p_function_body1(p):
     'FUNCTION_BODY : instructions '
-
+    
     params_list = []
-
+    
     if isinstance(p[1], list):
         for instr in p[1]:
-            if instr.startswith(('+', '-', '*', '/')):
+            if isinstance(instr, int):
+                params_list.append(str(instr))
+            elif instr.startswith(('+', '-', '*', '/')):
                 operator = instr[0]
                 if operator == '+':
                     operator = 'add'
@@ -231,7 +249,9 @@ def p_function_body1(p):
             else:
                 params_list.append(str(instr))
     else:
-        if p[1].startswith(('+', '-', '*', '/')):
+        if isinstance(p[1], int):
+            params_list.append(str(p[1]))
+        elif p[1].startswith(('+', '-', '*', '/')):
             operator = p[1][0]
             if operator == '+':
                 operator = 'add'
@@ -241,10 +261,10 @@ def p_function_body1(p):
                 operator = 'mul'
             elif operator == '/':
                 operator = 'div'
-            params_list.append(operator + '\n' + p[1][1:]) 
+            params_list.append(operator + '\n' + p[1][1:])
         else:
             params_list.append(str(p[1]))
-
+    
     p[0] = params_list
 
     
@@ -253,12 +273,6 @@ def p_function_body2(p):
     params_list = p[1]
 
     p[0] = params_list
-    
-def p_error(p):
-    if p:
-        raise SyntaxError("Syntax error at '%s'" % p.value)
-    else:
-        raise SyntaxError("Syntax error at EOF")
 
 def p_function_definition2(p):
     'FUNCTION_DEFINITION : COLON WORD PRINTFUNC SEMICOLON'
@@ -271,11 +285,23 @@ def p_function_definition2(p):
     p[0] = ""
     
 def p_printfunc(p):
-    'PRINTFUNC : DOT QUOTE WORD QUOTE'
+    'PRINTFUNC : DOT QUOTE words QUOTE'
     name = p[3]
     
     p[0] = name
+
+def p_words1(p):
+    'words : words WORD '
+    p[0] = p[1] + ' ' + p[2]
     
+def p_words3(p):
+    'words : words WORD sinais'
+    p[0] = p[1] + ' ' + p[2] + ' ' + p[3]
+
+def p_words2(p):
+    'words : WORD'
+    p[0] = p[1]    
+            
 def p_functioncall(p):
     'instructions : WORD'
     function_name = p[1]
@@ -283,6 +309,24 @@ def p_functioncall(p):
     if function_name in functions:
         instructions = functions[function_name]
         p[0] = 'start\npusha ' + function_name + '\ncall\nstop\n' + function_name + ':\npushs "' + instructions + '"\nwrites\nreturn\n' 
+    
+def p_sinais(p):
+    """sinais : EXCLAMATION
+                | INTERROGATION
+    """
+    p[0] = p[1]
+
+
+def p_condicional(p):
+    'CONDICIONAL : '
+    p[0] = ''
+
+
+def p_error(p):
+    if p:
+        raise SyntaxError("Syntax error at '%s'" % p.value)
+    else:
+        raise SyntaxError("Syntax error at EOF")
 
 # Build the parser
 parser = yacc.yacc()

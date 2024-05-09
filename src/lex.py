@@ -18,6 +18,8 @@ tokens = (
     'MIDFUNC',
     'QUOTE',
     'EMIT',
+    'EXCLAMATION',
+    'INTERROGATION',
 
 )
 
@@ -30,6 +32,8 @@ t_COLON = r':'
 t_SEMICOLON = r';'
 t_DOT = r'\.'
 t_QUOTE = r'"'
+t_EXCLAMATION = r'!'
+t_INTERROGATION = r'\?'
 
 
 parameter_list = False
@@ -69,7 +73,6 @@ def t_MIDFUNC(t):
     global parameter_list
     parameter_list = False
     return t
-
 
 t_ignore = ' \t'
 

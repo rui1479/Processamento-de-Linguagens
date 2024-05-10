@@ -8,7 +8,7 @@ instructions : instructions instruction
              | instruction
              | instructions instruction WORD
              | FUNCTION_DEFINITION
-             | WORD
+             | FUNCCALL
              | CONDICIONAL
 
 instruction : NUMBER
@@ -281,8 +281,9 @@ def p_function_definition2(p):
     instructions = p[3]
 
     functions[function_name] = (instructions)
+        
+    p[0] = ''
 
-    p[0] = ""
     
 def p_printfunc(p):
     'PRINTFUNC : DOT QUOTE words QUOTE'
@@ -293,6 +294,7 @@ def p_printfunc(p):
 def p_words1(p):
     'words : words WORD '
     p[0] = p[1] + ' ' + p[2]
+     
     
 def p_words3(p):
     'words : words WORD sinais'
@@ -303,19 +305,46 @@ def p_words2(p):
     p[0] = p[1]    
             
 def p_functioncall(p):
-    'instructions : WORD'
+    'instructions : FUNCCALL'
+    
+    p[0] = p[1]
+    
+def p_funccall(p):
+    'FUNCCALL : WORD'
     function_name = p[1]
     
     if function_name in functions:
         instructions = functions[function_name]
-        p[0] = 'start\npusha ' + function_name + '\ncall\nstop\n' + function_name + ':\npushs "' + instructions + '"\nwrites\nreturn\n' 
-    
+        p[0] = 'start\npusha ' + function_name + '\ncall\nstop\n' + function_name + ':\npusha ' + instructions + '\ncall\nreturn\n'
+        
+        if instructions in functions:
+            secundary_func = functions[instructions]
+            p[0] += 'pusha ' + instructions + '\ncall\n' + instructions + ':\npushs "' + secundary_func + '"\nwrites\nreturn\n'
+
+        
 def p_sinais(p):
     """sinais : EXCLAMATION
                 | INTERROGATION
     """
     p[0] = p[1]
 
+def p_function_definition3(p):
+    'FUNCTION_DEFINITION : COLON funcword SEMICOLON'
+    
+    p[0] = p[2]
+    
+def p_funcword(p):
+    'funcword : WORD WORD'
+    
+    function_name = p[1]
+    instructions = p[2]
+    
+    functions[function_name] = instructions
+    
+    
+    p[0] = ''
+
+    
 
 def p_condicional(p):
     'CONDICIONAL : '

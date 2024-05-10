@@ -22,6 +22,12 @@ tokens = (
     'INTERROGATION',
     'CR',
     'KEY',
+    'IF',
+    'THEN',
+    'ELSE',
+    'SUP',
+    'INF',
+    'EQUALS'
 )
 
 t_MINUS = r'-'
@@ -36,7 +42,9 @@ t_QUOTE = r'"'
 t_EXCLAMATION = r'!'
 t_INTERROGATION = r'\?'
 t_CR = r'\n'
-
+t_SUP = r'\>'
+t_INF = r'\<'
+t_EQUALS = r'='
 
 parameter_list = False
 
@@ -50,6 +58,7 @@ def t_NUMBER(t):
 def t_KEY(t):
     r'KEY'
     return t
+
 
 def t_WORD(t):
     r'[a-zA-Z_][a-zA-Z0-9_]*'
@@ -81,7 +90,6 @@ def t_MIDFUNC(t):
     return t
 
 
-
 t_ignore = ' \t'
 
 
@@ -102,6 +110,7 @@ def count_id(tokens):
             count += 1
     return count
 
+
 def count_number(tokens):
     count = 0
     for token in tokens:
@@ -109,17 +118,18 @@ def count_number(tokens):
             count += 1
     return count
 
+
 lexer = lex.lex()
 
 
-# def lexer_debug(example):
-#     lexer.input(example)
-#     tokens = []
-#     while token := lexer.token():
-#         print(token)
-#         tokens.append(token)
-#     print(count_id(tokens))
+def lexer_debug(example):
+    lexer.input(example)
+    tokens = []
+    while token := lexer.token():
+        print(token)
+        tokens.append(token)
+    print(count_id(tokens))
 
 
-# exemplo = ": AVERAGE ( a b -- avg ) + 2/ ;"
-# lexer_debug(exemplo)
+exemplo =": factorial1  ( n -- n! ) "
+lexer_debug(exemplo)

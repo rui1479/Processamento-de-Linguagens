@@ -30,7 +30,7 @@ FUNCTION_BODY : instructions
                 | instruction
                                 
                        
-CONDICIONAL : 
+CONDICIONAL : instruction IF instruction ELSE instruction THEN
 
 PRINTFUNC : DOT QUOTE words QUOTE
 
@@ -56,7 +56,9 @@ operator : '+'
       | '-'
       | '*' 
       | '/'
-      
+      | '='
+      | '<'
+      | '>'
 """
 
 
@@ -121,6 +123,12 @@ def p_instructions3(p):
         instruction += "sub\n"
     elif p[1] == '*':
         instruction += "mul\n"
+    elif p[1] == '=':
+        instruction += "eq\n"
+    elif p[1] == '<':
+        instruction += "inf\n"
+    elif p[1] == '>':
+        instruction += "sup\n"
     elif p[1] == '/':
         if p[2] == 0:
             raise ZeroDivisionError("Division by zero!")
@@ -170,7 +178,10 @@ def p_operator(p):
     '''operator : PLUS
                 | MINUS
                 | TIMES
-                | DIVIDE'''
+                | DIVIDE
+                | SUP
+                | INF
+                | EQUALS'''
     p[0] = p[1]
 
 def p_instruction_print(p):
@@ -367,11 +378,15 @@ def p_cr1(p):
 def p_cr2(p):
     'CARACTER : KEY'
     p[0] = '\nread\nstoreg ' + str(count_id(tokens)) + '\n'
-    
+
+
+
 
 def p_condicional(p):
-    'CONDICIONAL : '
-    p[0] = ''
+    '''
+    CONDICIONAL :  instruction IF instruction ELSE instruction THEN
+    '''
+    p[0] = p[1] + p[3] + p[5]
 
 
 def p_error(p):

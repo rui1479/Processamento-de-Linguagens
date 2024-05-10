@@ -20,7 +20,8 @@ tokens = (
     'EMIT',
     'EXCLAMATION',
     'INTERROGATION',
-
+    'CR',
+    'KEY',
 )
 
 t_MINUS = r'-'
@@ -34,6 +35,7 @@ t_DOT = r'\.'
 t_QUOTE = r'"'
 t_EXCLAMATION = r'!'
 t_INTERROGATION = r'\?'
+t_CR = r'\n'
 
 
 parameter_list = False
@@ -44,6 +46,10 @@ def t_NUMBER(t):
     t.value = int(t.value)
     return t
 
+
+def t_KEY(t):
+    r'KEY'
+    return t
 
 def t_WORD(t):
     r'[a-zA-Z_][a-zA-Z0-9_]*'
@@ -73,6 +79,8 @@ def t_MIDFUNC(t):
     global parameter_list
     parameter_list = False
     return t
+
+
 
 t_ignore = ' \t'
 

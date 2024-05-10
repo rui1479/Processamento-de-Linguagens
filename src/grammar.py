@@ -14,6 +14,10 @@ instructions : instructions instruction
 instruction : NUMBER
             | operator
             | PRINT
+            | CARACTER
+            
+CARACTER : CR
+        | KEY
                         
 'FUNCTION_DEFINITION : COLON WORD LPAREN FUNCTION_PARAMS RPAREN FUNCTION_BODY SEMICOLON'
                      | COLON WORD PRINTFUNC SEMICOLON
@@ -158,6 +162,9 @@ def p_instruction_operator(p):
     'instruction : operator'
     p[0] = p[1]
 
+def p_instruction_caracter(p):
+    'instruction : CARACTER'
+    p[0] = p[1]
 
 def p_operator(p):
     '''operator : PLUS
@@ -285,11 +292,17 @@ def p_function_definition2(p):
     p[0] = ''
 
     
-def p_printfunc(p):
+def p_printfunc1(p):
     'PRINTFUNC : DOT QUOTE words QUOTE'
     name = p[3]
     
     p[0] = name
+
+def p_printfunc2(p):
+    'PRINTFUNC : DOT QUOTE words QUOTE CARACTER'
+    
+    p[0] = p[3] + p[5]
+    
 
 def p_words1(p):
     'words : words WORD '
@@ -303,10 +316,10 @@ def p_words3(p):
 def p_words2(p):
     'words : WORD'
     p[0] = p[1]    
+    
             
 def p_functioncall(p):
     'instructions : FUNCCALL'
-    
     p[0] = p[1]
     
 def p_funccall(p):
@@ -315,11 +328,14 @@ def p_funccall(p):
     
     if function_name in functions:
         instructions = functions[function_name]
-        p[0] = 'start\npusha ' + function_name + '\ncall\nstop\n' + function_name + ':\npusha ' + instructions + '\ncall\nreturn\n'
+        p[0] = 'start\npusha ' + function_name + '\ncall\nstop\n' + function_name + ':\n'
         
         if instructions in functions:
             secundary_func = functions[instructions]
-            p[0] += 'pusha ' + instructions + '\ncall\n' + instructions + ':\npushs "' + secundary_func + '"\nwrites\nreturn\n'
+            p[0] += 'pusha ' + instructions + '\ncall\nreturn\n' + instructions + ':\npushs "' + secundary_func + '"\nwrites\nreturn\n'
+        else:
+            p[0] += 'pushs "' + instructions + '"\nwrites\nreturn\n'
+
 
         
 def p_sinais(p):
@@ -344,6 +360,13 @@ def p_funcword(p):
     
     p[0] = ''
 
+def p_cr1(p):
+    'CARACTER : CR'
+    p[0] = '\n'
+    
+def p_cr2(p):
+    'CARACTER : KEY'
+    p[0] = '\nread\nstoreg ' + str(count_id(tokens)) + '\n'
     
 
 def p_condicional(p):

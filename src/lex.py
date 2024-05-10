@@ -59,6 +59,17 @@ def t_KEY(t):
     r'KEY'
     return t
 
+def t_IF(t):
+    r'if'
+    return t
+
+def t_THEN(t):
+    r'then'
+    return t
+
+def t_ELSE(t):
+    r'else'
+    return t
 
 def t_WORD(t):
     r'[a-zA-Z_][a-zA-Z0-9_]*'
@@ -130,5 +141,5 @@ lexer = lex.lex()
 #     print(count_id(tokens))
 
 
-# exemplo = ": AVERAGE ( a b -- avg ) + 2/ ;"
+# exemplo = ": maior > if pessego else banana then ; "
 # lexer_debug(exemplo)

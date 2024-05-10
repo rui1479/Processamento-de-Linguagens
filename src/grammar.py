@@ -10,7 +10,7 @@ instructions : instructions instruction
              | FUNCTION_DEFINITION
              | FUNCCALL
              | WORD instructions
-             | CONDICIONAL
+
 
 instruction : NUMBER
             | operator
@@ -22,6 +22,7 @@ CARACTER : CR
                         
 'FUNCTION_DEFINITION : COLON WORD LPAREN FUNCTION_PARAMS RPAREN FUNCTION_BODY SEMICOLON'
                      | COLON WORD PRINTFUNC SEMICOLON
+                     | CONDICIONAL
 
 FUNCTION_PARAMS : PARAMS FUNCTION_PARAMS
                 | PARAMS MIDFUNC WORD
@@ -112,44 +113,63 @@ def p_instructions3(p):
     '''
     instruction = ''
     function_name = p[3]
-    x = count_number(tokens)
+    function_info = functions[function_name] 
+    
+    if "if" in function_info and "else" in function_info and "then" in function_info:
+        operador = function_info['opera']
+        primparam = function_info['primeiro']
+        segundparam = function_info['segundo']
+        
+        if operador == '<':
+            operador = 'inf'
+        elif operador == '>':
+            operador = 'sup'
+        elif operador == '=':
+            operador = 'equals'
+        
+        instruction = 'start\npushi ' + str(p[1])+ '\npushi ' + str(p[2])+ '\n' + operador + '\njz ELSE0\njump ELSE2\nELSE0:\npushs ' + primparam + '\njump ENDIF\nELSE2:\npushs ' + segundparam + '\njump ENDIF\nENDIF:\nstop\n'
 
-    if isinstance(p[2], int):
-        instruction += "pushi " + str(p[2]) + "\n"
+        p[0] = instruction
+        return
     else:
-        instruction += p[2]
+        x = count_number(tokens)
 
-    if p[1] == '+':
-        instruction += "add\n"
-    elif p[1] == '-':
-        instruction += "sub\n"
-    elif p[1] == '*':
-        instruction += "mul\n"
-    elif p[1] == '=':
-        instruction += "eq\n"
-    elif p[1] == '<':
-        instruction += "inf\n"
-    elif p[1] == '>':
-        instruction += "sup\n"
-    elif p[1] == '/':
-        if p[2] == 0:
-            raise ZeroDivisionError("Division by zero!")
-        instruction += "div\n"
-    else:
-        if isinstance(p[1], int):
-            instruction += "pushi " + str(p[1]) + "\n"
+        if isinstance(p[2], int):
+            instruction += "pushi " + str(p[2]) + "\n"
+        else:
+            instruction += p[2]
 
-    if function_name in functions:
-        function_info = functions[function_name]
-        function_params = function_info['params']
-        instructions = function_info['instructions']
+        if p[1] == '+':
+            instruction += "add\n"
+        elif p[1] == '-':
+            instruction += "sub\n"
+        elif p[1] == '*':
+            instruction += "mul\n"
+        elif p[1] == '=':
+            instruction += "eq\n"
+        elif p[1] == '<':
+            instruction += "inf\n"
+        elif p[1] == '>':
+            instruction += "sup\n"
+        elif p[1] == '/':
+            if p[2] == 0:
+                raise ZeroDivisionError("Division by zero!")
+            instruction += "div\n"
+        else:
+            if isinstance(p[1], int):
+                instruction += "pushi " + str(p[1]) + "\n"
 
-    instruction += 'pusha ' + function_name + '\ncall\nstop\n' + function_name + ':\n'
-    for i in range(x):
-        instruction += 'pushg ' + str(i + x) + '\n'
-    for instr in instructions:
-        instruction += instr + '\n'
-    instruction += 'return\n'
+        if function_name in functions:
+            function_info = functions[function_name]
+            function_params = function_info['params']
+            instructions = function_info['instructions']
+
+        instruction += 'pusha ' + function_name + '\ncall\nstop\n' + function_name + ':\n'
+        for i in range(x):
+            instruction += 'pushg ' + str(i + x) + '\n'
+        for instr in instructions:
+            instruction += instr + '\n'
+        instruction += 'return\n'
 
     p[0] = instruction
 
@@ -200,7 +220,7 @@ def p_instructions5(p):
 
 
 def p_instructions6(p):
-    'instructions : CONDICIONAL'
+    'FUNCTION_DEFINITION : CONDICIONAL'
     p[0] = p[1]
 
 
@@ -227,7 +247,14 @@ def p_operator(p):
                 | SUP
                 | INF
                 | EQUALS'''
-    p[0] = p[1]
+    if p[1] == '<':
+        p[0] = 'inf'
+    elif p[1] == '>':
+        p[0] = 'sup'
+    elif p[1] == '=':
+        p[0] = 'equals'
+    else:    
+        p[0] = p[1]
 
 
 def p_instruction_print(p):
@@ -395,8 +422,7 @@ def p_funccall(p):
 
         if instructions in functions:
             secundary_func = functions[instructions]
-            p[
-                0] += 'pusha ' + instructions + '\ncall\nreturn\n' + instructions + ':\npushs "' + secundary_func + '"\nwrites\nreturn\n'
+            p[0] += 'pusha ' + instructions + '\ncall\nreturn\n' + instructions + ':\npushs "' + secundary_func + '"\nwrites\nreturn\n'
         else:
             p[0] += 'pushs "' + instructions + '"\nwrites\nreturn\n'
 
@@ -435,12 +461,31 @@ def p_cr2(p):
     p[0] = '\nread\nstoreg ' + str(count_id(tokens)) + '\n'
 
 
-def p_condicional(p):
+def p_condicional1(p):
     '''
-    CONDICIONAL :  instruction IF instruction ELSE instruction THEN
+    CONDICIONAL : COLON WORD operator IF part ELSE part THEN SEMICOLON
+    '''   
+    
+    function_name = p[2]
+    OPERA = p[3]
+    IF = p[4]
+    PARAM1 = p[5]
+    ELSE = p[6]
+    PARAM2 = p[7]
+    THEN = p[8]
+        
+    functions[function_name] = {'opera': OPERA,'primeiro': PARAM1 ,'segundo': PARAM2, 'if': IF, 'else': ELSE, 'then': THEN}
+    
+    p[0] = ""
+    
+    
+    
+def p_part1(p):
     '''
-    p[0] = p[1] + p[3] + p[5]
-
+    part : DOT QUOTE words QUOTE
+    '''
+    
+    p[0] = p[2] + p[3] + p[4]
 
 def p_error(p):
     if p:

@@ -46,7 +46,6 @@ t_SUP = r'\>'
 t_INF = r'\<'
 t_EQUALS = r'='
 
-
 parameter_list = False
 
 
@@ -59,6 +58,7 @@ def t_NUMBER(t):
 def t_KEY(t):
     r'KEY'
     return t
+
 
 def t_WORD(t):
     r'[a-zA-Z_][a-zA-Z0-9_]*'
@@ -90,7 +90,6 @@ def t_MIDFUNC(t):
     return t
 
 
-
 t_ignore = ' \t'
 
 
@@ -111,6 +110,7 @@ def count_id(tokens):
             count += 1
     return count
 
+
 def count_number(tokens):
     count = 0
     for token in tokens:
@@ -118,8 +118,8 @@ def count_number(tokens):
             count += 1
     return count
 
-lexer = lex.lex()
 
+lexer = lex.lex()
 
 # def lexer_debug(example):
 #     lexer.input(example)

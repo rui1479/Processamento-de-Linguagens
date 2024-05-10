@@ -9,6 +9,7 @@ instructions : instructions instruction
              | instructions instruction WORD
              | FUNCTION_DEFINITION
              | FUNCCALL
+             | WORD instructions
              | CONDICIONAL
 
 instruction : NUMBER
@@ -61,7 +62,6 @@ operator : '+'
       | '>'
 """
 
-
 functions = {}
 
 
@@ -78,7 +78,7 @@ def p_instructions1(p):
     '''instructions : instructions  instruction
     '''
     instruction = ''
-    
+
     if isinstance(p[1], int):
         instruction += "pushi " + str(p[1]) + "\n"
     else:
@@ -97,13 +97,15 @@ def p_instructions1(p):
     else:
         if isinstance(p[2], int):
             instruction += "pushi " + str(p[2]) + "\n"
-            
+
     p[0] = instruction
+
 
 def p_instructions2(p):
     '''instructions : instruction
     '''
     p[0] = p[1]
+
 
 def p_instructions3(p):
     '''instructions : instructions instruction WORD
@@ -111,7 +113,7 @@ def p_instructions3(p):
     instruction = ''
     function_name = p[3]
     x = count_number(tokens)
-    
+
     if isinstance(p[2], int):
         instruction += "pushi " + str(p[2]) + "\n"
     else:
@@ -136,12 +138,12 @@ def p_instructions3(p):
     else:
         if isinstance(p[1], int):
             instruction += "pushi " + str(p[1]) + "\n"
-    
+
     if function_name in functions:
         function_info = functions[function_name]
         function_params = function_info['params']
         instructions = function_info['instructions']
-        
+
     instruction += 'pusha ' + function_name + '\ncall\nstop\n' + function_name + ':\n'
     for i in range(x):
         instruction += 'pushg ' + str(i + x) + '\n'
@@ -149,17 +151,58 @@ def p_instructions3(p):
         instruction += instr + '\n'
     instruction += 'return\n'
 
-            
     p[0] = instruction
 
 
 def p_instructions4(p):
     'instructions : FUNCTION_DEFINITION'
     p[0] = p[1]
-    
+
+
 def p_instructions5(p):
+    '''instruction : instructions WORD instructions
+    '''
+
+    function_name = p[2]
+    instruction = ''
+    x = count_number(tokens)
+    if isinstance(p[1], int):
+        instruction += "pushi " + str(p[1]) + "\n"
+    else:
+        instruction += p[1]
+
+    if function_name in functions:
+        function_info = functions[function_name]
+        function_params = function_info['params']
+        instructions = function_info['instructions']
+
+    instruction += 'pusha ' + function_name + '\ncall\n'
+    if p[3] == '+':
+        instruction += "add\n"
+    elif p[3] == '-':
+        instruction += "sub\n"
+    elif p[3] == '*':
+        instruction += "mul\n"
+    elif p[3] == '/':
+        if p[2] == 0:
+            raise ZeroDivisionError("Division by zero!")
+        instruction += "div\n"
+    instruction += 'stop\n' + function_name + ':\n'
+
+    for i in range(x):
+        instruction += 'pushg ' + str(i + x) + '\n'
+    for instr in instructions:
+        instruction += 'pushi ' + instr + '\nstoreg ' + str(i + x) + '\n'
+    instruction += 'return\n'
+
+
+    p[0] = instruction
+
+
+def p_instructions6(p):
     'instructions : CONDICIONAL'
     p[0] = p[1]
+
 
 def p_instruction_number(p):
     'instruction : NUMBER'
@@ -170,9 +213,11 @@ def p_instruction_operator(p):
     'instruction : operator'
     p[0] = p[1]
 
+
 def p_instruction_caracter(p):
     'instruction : CARACTER'
     p[0] = p[1]
+
 
 def p_operator(p):
     '''operator : PLUS
@@ -183,6 +228,7 @@ def p_operator(p):
                 | INF
                 | EQUALS'''
     p[0] = p[1]
+
 
 def p_instruction_print(p):
     'instruction : PRINT'
@@ -230,6 +276,7 @@ def p_function_params2(p):
 
     p[0] = params_list
 
+
 def p_params_id(p):
     'PARAMS : ID'
     p[0] = p[1]
@@ -244,11 +291,12 @@ def p_params_word(p):
     'PARAMS : WORD'
     p[0] = p[1]
 
+
 def p_function_body1(p):
     'FUNCTION_BODY : instructions '
-    
+
     params_list = []
-    
+
     if isinstance(p[1], list):
         for instr in p[1]:
             if isinstance(instr, int):
@@ -282,104 +330,109 @@ def p_function_body1(p):
             params_list.append(operator + '\n' + p[1][1:])
         else:
             params_list.append(str(p[1]))
-    
+
     p[0] = params_list
 
-    
+
 def p_function_body2(p):
     'FUNCTION_BODY : instruction'
     params_list = p[1]
 
     p[0] = params_list
 
+
 def p_function_definition2(p):
     'FUNCTION_DEFINITION : COLON WORD PRINTFUNC SEMICOLON'
-    
+
     function_name = p[2]
     instructions = p[3]
 
     functions[function_name] = (instructions)
-        
+
     p[0] = ''
 
-    
+
 def p_printfunc1(p):
     'PRINTFUNC : DOT QUOTE words QUOTE'
     name = p[3]
-    
+
     p[0] = name
+
 
 def p_printfunc2(p):
     'PRINTFUNC : DOT QUOTE words QUOTE CARACTER'
-    
+
     p[0] = p[3] + p[5]
-    
+
 
 def p_words1(p):
     'words : words WORD '
     p[0] = p[1] + ' ' + p[2]
-     
-    
+
+
 def p_words3(p):
     'words : words WORD sinais'
     p[0] = p[1] + ' ' + p[2] + ' ' + p[3]
 
+
 def p_words2(p):
     'words : WORD'
-    p[0] = p[1]    
-    
-            
+    p[0] = p[1]
+
+
 def p_functioncall(p):
     'instructions : FUNCCALL'
     p[0] = p[1]
-    
+
+
 def p_funccall(p):
     'FUNCCALL : WORD'
     function_name = p[1]
-    
+
     if function_name in functions:
         instructions = functions[function_name]
         p[0] = 'start\npusha ' + function_name + '\ncall\nstop\n' + function_name + ':\n'
-        
+
         if instructions in functions:
             secundary_func = functions[instructions]
-            p[0] += 'pusha ' + instructions + '\ncall\nreturn\n' + instructions + ':\npushs "' + secundary_func + '"\nwrites\nreturn\n'
+            p[
+                0] += 'pusha ' + instructions + '\ncall\nreturn\n' + instructions + ':\npushs "' + secundary_func + '"\nwrites\nreturn\n'
         else:
             p[0] += 'pushs "' + instructions + '"\nwrites\nreturn\n'
 
 
-        
 def p_sinais(p):
     """sinais : EXCLAMATION
                 | INTERROGATION
     """
     p[0] = p[1]
 
+
 def p_function_definition3(p):
     'FUNCTION_DEFINITION : COLON funcword SEMICOLON'
-    
+
     p[0] = p[2]
-    
+
+
 def p_funcword(p):
     'funcword : WORD WORD'
-    
+
     function_name = p[1]
     instructions = p[2]
-    
+
     functions[function_name] = instructions
-    
-    
+
     p[0] = ''
+
 
 def p_cr1(p):
     'CARACTER : CR'
     p[0] = '\n'
-    
+
+
 def p_cr2(p):
     'CARACTER : KEY'
     p[0] = '\nread\nstoreg ' + str(count_id(tokens)) + '\n'
-
-
 
 
 def p_condicional(p):
@@ -395,6 +448,7 @@ def p_error(p):
     else:
         raise SyntaxError("Syntax error at EOF")
 
+
 # Build the parser
 parser = yacc.yacc()
 
@@ -408,7 +462,7 @@ while True:
         if id_count > 0:
             f.write("pushi 0\n" * id_count)
         result = parser.parse(s)
-        
+
         # Verifica se a entrada define uma função
         if not s.startswith(':') and not s.endswith(';'):
             # Verifica se o resultado contém um start e um stop
@@ -422,5 +476,5 @@ while True:
 
     except Exception as e:
         print(e)
-        
+
 f.close()

@@ -64,7 +64,8 @@ operator : '+'
 """
 
 functions = {}
-
+flagN = False
+flagW = False
 
 # Define grammar rules
 def p_statement_function(p):
@@ -76,28 +77,35 @@ def p_statement_function(p):
 
 
 def p_instructions1(p):
-    '''instructions : instructions  instruction
+    '''instructions : instructions instruction 
     '''
     instruction = ''
-
+        
     if isinstance(p[1], int):
         instruction += "pushi " + str(p[1]) + "\n"
     else:
         instruction += p[1]
 
-    if p[2] == '+':
-        instruction += "add\n"
-    elif p[2] == '-':
-        instruction += "sub\n"
-    elif p[2] == '*':
-        instruction += "mul\n"
-    elif p[2] == '/':
-        if p[1] == 0:
-            raise ZeroDivisionError("Division by zero!")
-        instruction += "div\n"
+    if isinstance(p[2], str):
+        if p[2] == '+':
+            instruction += "add\n"
+        elif p[2] == '-':
+            instruction += "sub\n"
+        elif p[2] == '*':
+            instruction += "mul\n"
+        elif p[2] == '/':
+            if p[1] == 0:
+                raise ZeroDivisionError("Division by zero!")
+            instruction += "div\n"
+        else:
+            if isinstance(p[2], int):
+                instruction += "pushi " + str(p[2]) + "\n"
+            
+        if p[2] == '.':
+            instruction += "writei\n"
+
     else:
-        if isinstance(p[2], int):
-            instruction += "pushi " + str(p[2]) + "\n"
+        instruction += "pushi " + str(p[2]) + "\n"
 
     p[0] = instruction
 
@@ -173,6 +181,75 @@ def p_instructions3(p):
 
     p[0] = instruction
 
+def p_instructions7(p):
+    '''instructions : instructions instruction WORD instruction
+    '''
+    instruction = ''
+    function_name = p[3]
+    function_info = functions[function_name] 
+    
+    if "if" in function_info and "else" in function_info and "then" in function_info:
+        operador = function_info['opera']
+        primparam = function_info['primeiro']
+        segundparam = function_info['segundo']
+        
+        if operador == '<':
+            operador = 'inf'
+        elif operador == '>':
+            operador = 'sup'
+        elif operador == '=':
+            operador = 'equals'
+        
+        instruction = 'start\npushi ' + str(p[1])+ '\npushi ' + str(p[2])+ '\n' + operador + '\njz ELSE0\njump ELSE2\nELSE0:\npushs ' + primparam + '\njump ENDIF\nELSE2:\npushs ' + segundparam + '\njump ENDIF\nENDIF:\nstop\n'
+
+        p[0] = instruction
+        return
+    else:
+        x = count_number(tokens)
+
+        if isinstance(p[2], int):
+            instruction += "pushi " + str(p[2]) + "\n"
+        else:
+            instruction += p[2]
+
+        if p[1] == '+':
+            instruction += "add\n"
+        elif p[1] == '-':
+            instruction += "sub\n"
+        elif p[1] == '*':
+            instruction += "mul\n"
+        elif p[1] == '=':
+            instruction += "eq\n"
+        elif p[1] == '<':
+            instruction += "inf\n"
+        elif p[1] == '>':
+            instruction += "sup\n"
+        elif p[1] == '/':
+            if p[2] == 0:
+                raise ZeroDivisionError("Division by zero!")
+            instruction += "div\n"
+        else:
+            if isinstance(p[1], int):
+                instruction += "pushi " + str(p[1]) + "\n"
+
+        if function_name in functions:
+            function_info = functions[function_name]
+            function_params = function_info['params']
+            instructions = function_info['instructions']
+
+        instruction += 'pusha ' + function_name + '\ncall\nstop\n' + function_name + ':\n'
+        for i in range(x):
+            instruction += 'pushg ' + str(i + x) + '\n'
+        for instr in instructions:
+            instruction += instr + '\n'
+        instruction += 'return\n'
+        
+        if p[4] == '.':
+            global flagN
+            flagN = True
+            
+
+    p[0] = instruction
 
 def p_instructions4(p):
     'instructions : FUNCTION_DEFINITION'
@@ -183,6 +260,7 @@ def p_instructions5(p):
     '''instruction : instructions WORD instructions
     '''
 
+    print(p[1], p[2], p[3])
     function_name = p[2]
     instruction = ''
     x = count_number(tokens)
@@ -197,13 +275,13 @@ def p_instructions5(p):
         instructions = function_info['instructions']
 
     instruction += 'pusha ' + function_name + '\ncall\n'
-    if p[3] == '+':
+    if p[3][0] == '+':
         instruction += "add\n"
-    elif p[3] == '-':
+    elif p[3][0] == '-':
         instruction += "sub\n"
-    elif p[3] == '*':
+    elif p[3][0] == '*':
         instruction += "mul\n"
-    elif p[3] == '/':
+    elif p[3][0] == '/':
         if p[2] == 0:
             raise ZeroDivisionError("Division by zero!")
         instruction += "div\n"
@@ -215,7 +293,10 @@ def p_instructions5(p):
         instruction += 'pushi ' + instr + '\nstoreg ' + str(i + x) + '\n'
     instruction += 'return\n'
 
-
+    if '+' in p[3][0]:
+        global flagN
+        flagN = True
+    
     p[0] = instruction
 
 
@@ -261,6 +342,9 @@ def p_instruction_print(p):
     'instruction : PRINT'
     p[0] = p[1]
 
+def p_print(p):
+    'PRINT : DOT'
+    p[0] = p[1]
 
 def p_print_num(p):
     'PRINT : NUMBER DOT'
@@ -381,6 +465,10 @@ def p_function_definition2(p):
 
 def p_printfunc1(p):
     'PRINTFUNC : DOT QUOTE words QUOTE'
+    global flagW
+    if flagW == False:
+        flagW = True
+        
     name = p[3]
 
     p[0] = name
@@ -388,9 +476,17 @@ def p_printfunc1(p):
 
 def p_printfunc2(p):
     'PRINTFUNC : DOT QUOTE words QUOTE CARACTER'
+    global flagW
+    if flagW == False:
+        flagW = True
 
     p[0] = p[3] + p[5]
+    
+def p_printfunc3(p):
+    'PRINTFUNC : QUOTE words QUOTE'
+    name = p[2]
 
+    p[0] = name
 
 def p_words1(p):
     'words : words WORD '
@@ -415,16 +511,16 @@ def p_functioncall(p):
 def p_funccall(p):
     'FUNCCALL : WORD'
     function_name = p[1]
-
+    
     if function_name in functions:
         instructions = functions[function_name]
         p[0] = 'start\npusha ' + function_name + '\ncall\nstop\n' + function_name + ':\n'
 
         if instructions in functions:
             secundary_func = functions[instructions]
-            p[0] += 'pusha ' + instructions + '\ncall\nreturn\n' + instructions + ':\npushs "' + secundary_func + '"\nwrites\nreturn\n'
+            p[0] += 'pusha ' + instructions + '\ncall\nreturn\n' + instructions + ':\npushs "' + secundary_func + '"\nreturn\n'
         else:
-            p[0] += 'pushs "' + instructions + '"\nwrites\nreturn\n'
+            p[0] += 'pushs "' + instructions + '"\nreturn\n'
 
 
 def p_sinais(p):
@@ -484,8 +580,17 @@ def p_part1(p):
     '''
     part : DOT QUOTE words QUOTE
     '''
+    global flagW
+    flagW = True
     
     p[0] = p[2] + p[3] + p[4]
+
+def p_part2(p):
+    '''
+    part : QUOTE words QUOTE
+    '''
+    
+    p[0] = p[1] + p[2] + p[3]
 
 def p_error(p):
     if p:
@@ -507,6 +612,11 @@ while True:
         if id_count > 0:
             f.write("pushi 0\n" * id_count)
         result = parser.parse(s)
+        if flagN:
+            result = result.replace('stop\n', 'writei\nstop\n')            
+            flagN = False
+        if flagW:
+            result = result.replace('stop\n', 'writes\nstop\n')            
 
         # Verifica se a entrada define uma função
         if not s.startswith(':') and not s.endswith(';'):

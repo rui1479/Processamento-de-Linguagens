@@ -347,8 +347,8 @@ def p_print(p):
     p[0] = p[1]
 
 def p_print_num(p):
-    'PRINT :  DOT NUMBER'
-    p[0] = "start\npushi" + str(p[2]) + "\nwritei\nstop\n"
+    'PRINT :  NUMBER DOT'
+    p[0] = "start\npushi" + str(p[1]) + "\nwritei\nstop\n"
 
 
 def p_print_string(p):
@@ -357,8 +357,8 @@ def p_print_string(p):
 
 
 def p_print_emit(p):
-    'PRINT : EMIT'
-    p[0] = "start\npushi 10\nputc\nstop\n"
+    'PRINT : NUMBER EMIT'
+    p[0] = "start\npushi"+ str(p[2]) +"\nstop\n"
 
 
 def p_function_definition1(p):

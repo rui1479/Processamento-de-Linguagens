@@ -23,9 +23,9 @@ Rule 17    operator -> INF
 Rule 18    operator -> EQUALS
 Rule 19    instruction -> PRINT
 Rule 20    PRINT -> DOT
-Rule 21    PRINT -> DOT NUMBER
+Rule 21    PRINT -> NUMBER DOT
 Rule 22    PRINT -> DOT QUOTE words QUOTE
-Rule 23    PRINT -> EMIT
+Rule 23    PRINT -> NUMBER EMIT
 Rule 24    FUNCTION_DEFINITION -> COLON WORD LPAREN FUNCTION_PARAMS RPAREN FUNCTION_BODY SEMICOLON
 Rule 25    FUNCTION_PARAMS -> PARAMS FUNCTION_PARAMS
 Rule 26    FUNCTION_PARAMS -> PARAMS MIDFUNC WORD
@@ -71,7 +71,7 @@ KEY                  : 46
 LPAREN               : 24
 MIDFUNC              : 26 28
 MINUS                : 13
-NUMBER               : 9 21
+NUMBER               : 9 21 23
 PLUS                 : 12
 QUOTE                : 22 22 33 33 34 34 35 35 48 48 49 49
 RPAREN               : 24
@@ -134,9 +134,9 @@ state 0
     (45) CARACTER -> . CR
     (46) CARACTER -> . KEY
     (20) PRINT -> . DOT
-    (21) PRINT -> . DOT NUMBER
+    (21) PRINT -> . NUMBER DOT
     (22) PRINT -> . DOT QUOTE words QUOTE
-    (23) PRINT -> . EMIT
+    (23) PRINT -> . NUMBER EMIT
     (47) CONDICIONAL -> . COLON WORD operator IF part ELSE part THEN SEMICOLON
 
     NUMBER          shift and go to state 7
@@ -152,7 +152,6 @@ state 0
     CR              shift and go to state 20
     KEY             shift and go to state 21
     DOT             shift and go to state 22
-    EMIT            shift and go to state 23
 
     statement                      shift and go to state 1
     instructions                   shift and go to state 2
@@ -198,9 +197,9 @@ state 2
     (45) CARACTER -> . CR
     (46) CARACTER -> . KEY
     (20) PRINT -> . DOT
-    (21) PRINT -> . DOT NUMBER
+    (21) PRINT -> . NUMBER DOT
     (22) PRINT -> . DOT QUOTE words QUOTE
-    (23) PRINT -> . EMIT
+    (23) PRINT -> . NUMBER EMIT
     (8) FUNCTION_DEFINITION -> . CONDICIONAL
     (24) FUNCTION_DEFINITION -> . COLON WORD LPAREN FUNCTION_PARAMS RPAREN FUNCTION_BODY SEMICOLON
     (32) FUNCTION_DEFINITION -> . COLON WORD PRINTFUNC SEMICOLON
@@ -209,7 +208,7 @@ state 2
     (47) CONDICIONAL -> . COLON WORD operator IF part ELSE part THEN SEMICOLON
 
     $end            reduce using rule 1 (statement -> instructions .)
-    WORD            shift and go to state 26
+    WORD            shift and go to state 25
     NUMBER          shift and go to state 7
     PLUS            shift and go to state 13
     MINUS           shift and go to state 14
@@ -221,11 +220,10 @@ state 2
     CR              shift and go to state 20
     KEY             shift and go to state 21
     DOT             shift and go to state 22
-    EMIT            shift and go to state 23
     COLON           shift and go to state 12
 
-    instructions                   shift and go to state 24
-    instruction                    shift and go to state 25
+    instructions                   shift and go to state 23
+    instruction                    shift and go to state 24
     operator                       shift and go to state 8
     CARACTER                       shift and go to state 9
     PRINT                          shift and go to state 10
@@ -249,7 +247,6 @@ state 3
     CR              reduce using rule 3 (instructions -> instruction .)
     KEY             reduce using rule 3 (instructions -> instruction .)
     DOT             reduce using rule 3 (instructions -> instruction .)
-    EMIT            reduce using rule 3 (instructions -> instruction .)
     COLON           reduce using rule 3 (instructions -> instruction .)
     $end            reduce using rule 3 (instructions -> instruction .)
     SEMICOLON       reduce using rule 3 (instructions -> instruction .)
@@ -271,7 +268,6 @@ state 4
     CR              reduce using rule 40 (FUNCCALL -> WORD .)
     KEY             reduce using rule 40 (FUNCCALL -> WORD .)
     DOT             reduce using rule 40 (FUNCCALL -> WORD .)
-    EMIT            reduce using rule 40 (FUNCCALL -> WORD .)
     COLON           reduce using rule 40 (FUNCCALL -> WORD .)
     $end            reduce using rule 40 (FUNCCALL -> WORD .)
     SEMICOLON       reduce using rule 40 (FUNCCALL -> WORD .)
@@ -293,7 +289,6 @@ state 5
     CR              reduce using rule 6 (instructions -> FUNCTION_DEFINITION .)
     KEY             reduce using rule 6 (instructions -> FUNCTION_DEFINITION .)
     DOT             reduce using rule 6 (instructions -> FUNCTION_DEFINITION .)
-    EMIT            reduce using rule 6 (instructions -> FUNCTION_DEFINITION .)
     COLON           reduce using rule 6 (instructions -> FUNCTION_DEFINITION .)
     $end            reduce using rule 6 (instructions -> FUNCTION_DEFINITION .)
     SEMICOLON       reduce using rule 6 (instructions -> FUNCTION_DEFINITION .)
@@ -315,7 +310,6 @@ state 6
     CR              reduce using rule 39 (instructions -> FUNCCALL .)
     KEY             reduce using rule 39 (instructions -> FUNCCALL .)
     DOT             reduce using rule 39 (instructions -> FUNCCALL .)
-    EMIT            reduce using rule 39 (instructions -> FUNCCALL .)
     COLON           reduce using rule 39 (instructions -> FUNCCALL .)
     $end            reduce using rule 39 (instructions -> FUNCCALL .)
     SEMICOLON       reduce using rule 39 (instructions -> FUNCCALL .)
@@ -324,7 +318,10 @@ state 6
 state 7
 
     (9) instruction -> NUMBER .
+    (21) PRINT -> NUMBER . DOT
+    (23) PRINT -> NUMBER . EMIT
 
+  ! shift/reduce conflict for DOT resolved as shift
     WORD            reduce using rule 9 (instruction -> NUMBER .)
     NUMBER          reduce using rule 9 (instruction -> NUMBER .)
     PLUS            reduce using rule 9 (instruction -> NUMBER .)
@@ -336,11 +333,13 @@ state 7
     EQUALS          reduce using rule 9 (instruction -> NUMBER .)
     CR              reduce using rule 9 (instruction -> NUMBER .)
     KEY             reduce using rule 9 (instruction -> NUMBER .)
-    DOT             reduce using rule 9 (instruction -> NUMBER .)
-    EMIT            reduce using rule 9 (instruction -> NUMBER .)
     COLON           reduce using rule 9 (instruction -> NUMBER .)
     $end            reduce using rule 9 (instruction -> NUMBER .)
     SEMICOLON       reduce using rule 9 (instruction -> NUMBER .)
+    DOT             shift and go to state 26
+    EMIT            shift and go to state 27
+
+  ! DOT             [ reduce using rule 9 (instruction -> NUMBER .) ]
 
 
 state 8
@@ -359,7 +358,6 @@ state 8
     CR              reduce using rule 10 (instruction -> operator .)
     KEY             reduce using rule 10 (instruction -> operator .)
     DOT             reduce using rule 10 (instruction -> operator .)
-    EMIT            reduce using rule 10 (instruction -> operator .)
     COLON           reduce using rule 10 (instruction -> operator .)
     $end            reduce using rule 10 (instruction -> operator .)
     SEMICOLON       reduce using rule 10 (instruction -> operator .)
@@ -381,7 +379,6 @@ state 9
     CR              reduce using rule 11 (instruction -> CARACTER .)
     KEY             reduce using rule 11 (instruction -> CARACTER .)
     DOT             reduce using rule 11 (instruction -> CARACTER .)
-    EMIT            reduce using rule 11 (instruction -> CARACTER .)
     COLON           reduce using rule 11 (instruction -> CARACTER .)
     $end            reduce using rule 11 (instruction -> CARACTER .)
     SEMICOLON       reduce using rule 11 (instruction -> CARACTER .)
@@ -403,7 +400,6 @@ state 10
     CR              reduce using rule 19 (instruction -> PRINT .)
     KEY             reduce using rule 19 (instruction -> PRINT .)
     DOT             reduce using rule 19 (instruction -> PRINT .)
-    EMIT            reduce using rule 19 (instruction -> PRINT .)
     COLON           reduce using rule 19 (instruction -> PRINT .)
     $end            reduce using rule 19 (instruction -> PRINT .)
     SEMICOLON       reduce using rule 19 (instruction -> PRINT .)
@@ -425,7 +421,6 @@ state 11
     CR              reduce using rule 8 (FUNCTION_DEFINITION -> CONDICIONAL .)
     KEY             reduce using rule 8 (FUNCTION_DEFINITION -> CONDICIONAL .)
     DOT             reduce using rule 8 (FUNCTION_DEFINITION -> CONDICIONAL .)
-    EMIT            reduce using rule 8 (FUNCTION_DEFINITION -> CONDICIONAL .)
     COLON           reduce using rule 8 (FUNCTION_DEFINITION -> CONDICIONAL .)
     $end            reduce using rule 8 (FUNCTION_DEFINITION -> CONDICIONAL .)
     SEMICOLON       reduce using rule 8 (FUNCTION_DEFINITION -> CONDICIONAL .)
@@ -439,9 +434,9 @@ state 12
     (47) CONDICIONAL -> COLON . WORD operator IF part ELSE part THEN SEMICOLON
     (44) funcword -> . WORD WORD
 
-    WORD            shift and go to state 27
+    WORD            shift and go to state 28
 
-    funcword                       shift and go to state 28
+    funcword                       shift and go to state 29
 
 state 13
 
@@ -459,7 +454,6 @@ state 13
     CR              reduce using rule 12 (operator -> PLUS .)
     KEY             reduce using rule 12 (operator -> PLUS .)
     DOT             reduce using rule 12 (operator -> PLUS .)
-    EMIT            reduce using rule 12 (operator -> PLUS .)
     COLON           reduce using rule 12 (operator -> PLUS .)
     $end            reduce using rule 12 (operator -> PLUS .)
     SEMICOLON       reduce using rule 12 (operator -> PLUS .)
@@ -482,7 +476,6 @@ state 14
     CR              reduce using rule 13 (operator -> MINUS .)
     KEY             reduce using rule 13 (operator -> MINUS .)
     DOT             reduce using rule 13 (operator -> MINUS .)
-    EMIT            reduce using rule 13 (operator -> MINUS .)
     COLON           reduce using rule 13 (operator -> MINUS .)
     $end            reduce using rule 13 (operator -> MINUS .)
     SEMICOLON       reduce using rule 13 (operator -> MINUS .)
@@ -505,7 +498,6 @@ state 15
     CR              reduce using rule 14 (operator -> TIMES .)
     KEY             reduce using rule 14 (operator -> TIMES .)
     DOT             reduce using rule 14 (operator -> TIMES .)
-    EMIT            reduce using rule 14 (operator -> TIMES .)
     COLON           reduce using rule 14 (operator -> TIMES .)
     $end            reduce using rule 14 (operator -> TIMES .)
     SEMICOLON       reduce using rule 14 (operator -> TIMES .)
@@ -528,7 +520,6 @@ state 16
     CR              reduce using rule 15 (operator -> DIVIDE .)
     KEY             reduce using rule 15 (operator -> DIVIDE .)
     DOT             reduce using rule 15 (operator -> DIVIDE .)
-    EMIT            reduce using rule 15 (operator -> DIVIDE .)
     COLON           reduce using rule 15 (operator -> DIVIDE .)
     $end            reduce using rule 15 (operator -> DIVIDE .)
     SEMICOLON       reduce using rule 15 (operator -> DIVIDE .)
@@ -551,7 +542,6 @@ state 17
     CR              reduce using rule 16 (operator -> SUP .)
     KEY             reduce using rule 16 (operator -> SUP .)
     DOT             reduce using rule 16 (operator -> SUP .)
-    EMIT            reduce using rule 16 (operator -> SUP .)
     COLON           reduce using rule 16 (operator -> SUP .)
     $end            reduce using rule 16 (operator -> SUP .)
     SEMICOLON       reduce using rule 16 (operator -> SUP .)
@@ -574,7 +564,6 @@ state 18
     CR              reduce using rule 17 (operator -> INF .)
     KEY             reduce using rule 17 (operator -> INF .)
     DOT             reduce using rule 17 (operator -> INF .)
-    EMIT            reduce using rule 17 (operator -> INF .)
     COLON           reduce using rule 17 (operator -> INF .)
     $end            reduce using rule 17 (operator -> INF .)
     SEMICOLON       reduce using rule 17 (operator -> INF .)
@@ -597,7 +586,6 @@ state 19
     CR              reduce using rule 18 (operator -> EQUALS .)
     KEY             reduce using rule 18 (operator -> EQUALS .)
     DOT             reduce using rule 18 (operator -> EQUALS .)
-    EMIT            reduce using rule 18 (operator -> EQUALS .)
     COLON           reduce using rule 18 (operator -> EQUALS .)
     $end            reduce using rule 18 (operator -> EQUALS .)
     SEMICOLON       reduce using rule 18 (operator -> EQUALS .)
@@ -620,7 +608,6 @@ state 20
     CR              reduce using rule 45 (CARACTER -> CR .)
     KEY             reduce using rule 45 (CARACTER -> CR .)
     DOT             reduce using rule 45 (CARACTER -> CR .)
-    EMIT            reduce using rule 45 (CARACTER -> CR .)
     COLON           reduce using rule 45 (CARACTER -> CR .)
     $end            reduce using rule 45 (CARACTER -> CR .)
     SEMICOLON       reduce using rule 45 (CARACTER -> CR .)
@@ -642,7 +629,6 @@ state 21
     CR              reduce using rule 46 (CARACTER -> KEY .)
     KEY             reduce using rule 46 (CARACTER -> KEY .)
     DOT             reduce using rule 46 (CARACTER -> KEY .)
-    EMIT            reduce using rule 46 (CARACTER -> KEY .)
     COLON           reduce using rule 46 (CARACTER -> KEY .)
     $end            reduce using rule 46 (CARACTER -> KEY .)
     SEMICOLON       reduce using rule 46 (CARACTER -> KEY .)
@@ -651,11 +637,10 @@ state 21
 state 22
 
     (20) PRINT -> DOT .
-    (21) PRINT -> DOT . NUMBER
     (22) PRINT -> DOT . QUOTE words QUOTE
 
-  ! shift/reduce conflict for NUMBER resolved as shift
     WORD            reduce using rule 20 (PRINT -> DOT .)
+    NUMBER          reduce using rule 20 (PRINT -> DOT .)
     PLUS            reduce using rule 20 (PRINT -> DOT .)
     MINUS           reduce using rule 20 (PRINT -> DOT .)
     TIMES           reduce using rule 20 (PRINT -> DOT .)
@@ -666,39 +651,13 @@ state 22
     CR              reduce using rule 20 (PRINT -> DOT .)
     KEY             reduce using rule 20 (PRINT -> DOT .)
     DOT             reduce using rule 20 (PRINT -> DOT .)
-    EMIT            reduce using rule 20 (PRINT -> DOT .)
     COLON           reduce using rule 20 (PRINT -> DOT .)
     $end            reduce using rule 20 (PRINT -> DOT .)
     SEMICOLON       reduce using rule 20 (PRINT -> DOT .)
-    NUMBER          shift and go to state 29
     QUOTE           shift and go to state 30
-
-  ! NUMBER          [ reduce using rule 20 (PRINT -> DOT .) ]
 
 
 state 23
-
-    (23) PRINT -> EMIT .
-
-    WORD            reduce using rule 23 (PRINT -> EMIT .)
-    NUMBER          reduce using rule 23 (PRINT -> EMIT .)
-    PLUS            reduce using rule 23 (PRINT -> EMIT .)
-    MINUS           reduce using rule 23 (PRINT -> EMIT .)
-    TIMES           reduce using rule 23 (PRINT -> EMIT .)
-    DIVIDE          reduce using rule 23 (PRINT -> EMIT .)
-    SUP             reduce using rule 23 (PRINT -> EMIT .)
-    INF             reduce using rule 23 (PRINT -> EMIT .)
-    EQUALS          reduce using rule 23 (PRINT -> EMIT .)
-    CR              reduce using rule 23 (PRINT -> EMIT .)
-    KEY             reduce using rule 23 (PRINT -> EMIT .)
-    DOT             reduce using rule 23 (PRINT -> EMIT .)
-    EMIT            reduce using rule 23 (PRINT -> EMIT .)
-    COLON           reduce using rule 23 (PRINT -> EMIT .)
-    $end            reduce using rule 23 (PRINT -> EMIT .)
-    SEMICOLON       reduce using rule 23 (PRINT -> EMIT .)
-
-
-state 24
 
     (7) instruction -> instructions . WORD instructions
     (2) instructions -> instructions . instruction
@@ -725,9 +684,9 @@ state 24
     (45) CARACTER -> . CR
     (46) CARACTER -> . KEY
     (20) PRINT -> . DOT
-    (21) PRINT -> . DOT NUMBER
+    (21) PRINT -> . NUMBER DOT
     (22) PRINT -> . DOT QUOTE words QUOTE
-    (23) PRINT -> . EMIT
+    (23) PRINT -> . NUMBER EMIT
     (8) FUNCTION_DEFINITION -> . CONDICIONAL
     (24) FUNCTION_DEFINITION -> . COLON WORD LPAREN FUNCTION_PARAMS RPAREN FUNCTION_BODY SEMICOLON
     (32) FUNCTION_DEFINITION -> . COLON WORD PRINTFUNC SEMICOLON
@@ -735,7 +694,7 @@ state 24
     (40) FUNCCALL -> . WORD
     (47) CONDICIONAL -> . COLON WORD operator IF part ELSE part THEN SEMICOLON
 
-    WORD            shift and go to state 26
+    WORD            shift and go to state 25
     NUMBER          shift and go to state 7
     PLUS            shift and go to state 13
     MINUS           shift and go to state 14
@@ -747,11 +706,10 @@ state 24
     CR              shift and go to state 20
     KEY             shift and go to state 21
     DOT             shift and go to state 22
-    EMIT            shift and go to state 23
     COLON           shift and go to state 12
 
-    instructions                   shift and go to state 24
-    instruction                    shift and go to state 25
+    instructions                   shift and go to state 23
+    instruction                    shift and go to state 24
     operator                       shift and go to state 8
     CARACTER                       shift and go to state 9
     PRINT                          shift and go to state 10
@@ -759,7 +717,7 @@ state 24
     FUNCCALL                       shift and go to state 6
     CONDICIONAL                    shift and go to state 11
 
-state 25
+state 24
 
     (2) instructions -> instructions instruction .
     (4) instructions -> instructions instruction . WORD
@@ -779,7 +737,6 @@ state 25
   ! reduce/reduce conflict for CR resolved using rule 2 (instructions -> instructions instruction .)
   ! reduce/reduce conflict for KEY resolved using rule 2 (instructions -> instructions instruction .)
   ! reduce/reduce conflict for DOT resolved using rule 2 (instructions -> instructions instruction .)
-  ! reduce/reduce conflict for EMIT resolved using rule 2 (instructions -> instructions instruction .)
   ! reduce/reduce conflict for COLON resolved using rule 2 (instructions -> instructions instruction .)
     NUMBER          reduce using rule 2 (instructions -> instructions instruction .)
     PLUS            reduce using rule 2 (instructions -> instructions instruction .)
@@ -792,7 +749,6 @@ state 25
     CR              reduce using rule 2 (instructions -> instructions instruction .)
     KEY             reduce using rule 2 (instructions -> instructions instruction .)
     DOT             reduce using rule 2 (instructions -> instructions instruction .)
-    EMIT            reduce using rule 2 (instructions -> instructions instruction .)
     COLON           reduce using rule 2 (instructions -> instructions instruction .)
     $end            reduce using rule 2 (instructions -> instructions instruction .)
     SEMICOLON       reduce using rule 2 (instructions -> instructions instruction .)
@@ -811,11 +767,10 @@ state 25
   ! CR              [ reduce using rule 3 (instructions -> instruction .) ]
   ! KEY             [ reduce using rule 3 (instructions -> instruction .) ]
   ! DOT             [ reduce using rule 3 (instructions -> instruction .) ]
-  ! EMIT            [ reduce using rule 3 (instructions -> instruction .) ]
   ! COLON           [ reduce using rule 3 (instructions -> instruction .) ]
 
 
-state 26
+state 25
 
     (7) instruction -> instructions WORD . instructions
     (40) FUNCCALL -> WORD .
@@ -845,9 +800,9 @@ state 26
     (45) CARACTER -> . CR
     (46) CARACTER -> . KEY
     (20) PRINT -> . DOT
-    (21) PRINT -> . DOT NUMBER
+    (21) PRINT -> . NUMBER DOT
     (22) PRINT -> . DOT QUOTE words QUOTE
-    (23) PRINT -> . EMIT
+    (23) PRINT -> . NUMBER EMIT
     (47) CONDICIONAL -> . COLON WORD operator IF part ELSE part THEN SEMICOLON
 
   ! shift/reduce conflict for NUMBER resolved as shift
@@ -863,7 +818,6 @@ state 26
   ! shift/reduce conflict for CR resolved as shift
   ! shift/reduce conflict for KEY resolved as shift
   ! shift/reduce conflict for DOT resolved as shift
-  ! shift/reduce conflict for EMIT resolved as shift
     NUMBER          shift and go to state 7
     COLON           shift and go to state 12
     WORD            shift and go to state 4
@@ -877,7 +831,6 @@ state 26
     CR              shift and go to state 20
     KEY             shift and go to state 21
     DOT             shift and go to state 22
-    EMIT            shift and go to state 23
 
   ! WORD            [ reduce using rule 40 (FUNCCALL -> WORD .) ]
   ! NUMBER          [ reduce using rule 40 (FUNCCALL -> WORD .) ]
@@ -891,7 +844,6 @@ state 26
   ! CR              [ reduce using rule 40 (FUNCCALL -> WORD .) ]
   ! KEY             [ reduce using rule 40 (FUNCCALL -> WORD .) ]
   ! DOT             [ reduce using rule 40 (FUNCCALL -> WORD .) ]
-  ! EMIT            [ reduce using rule 40 (FUNCCALL -> WORD .) ]
   ! COLON           [ reduce using rule 40 (FUNCCALL -> WORD .) ]
 
     instructions                   shift and go to state 32
@@ -903,7 +855,49 @@ state 26
     PRINT                          shift and go to state 10
     CONDICIONAL                    shift and go to state 11
 
+state 26
+
+    (21) PRINT -> NUMBER DOT .
+
+    WORD            reduce using rule 21 (PRINT -> NUMBER DOT .)
+    NUMBER          reduce using rule 21 (PRINT -> NUMBER DOT .)
+    PLUS            reduce using rule 21 (PRINT -> NUMBER DOT .)
+    MINUS           reduce using rule 21 (PRINT -> NUMBER DOT .)
+    TIMES           reduce using rule 21 (PRINT -> NUMBER DOT .)
+    DIVIDE          reduce using rule 21 (PRINT -> NUMBER DOT .)
+    SUP             reduce using rule 21 (PRINT -> NUMBER DOT .)
+    INF             reduce using rule 21 (PRINT -> NUMBER DOT .)
+    EQUALS          reduce using rule 21 (PRINT -> NUMBER DOT .)
+    CR              reduce using rule 21 (PRINT -> NUMBER DOT .)
+    KEY             reduce using rule 21 (PRINT -> NUMBER DOT .)
+    DOT             reduce using rule 21 (PRINT -> NUMBER DOT .)
+    COLON           reduce using rule 21 (PRINT -> NUMBER DOT .)
+    $end            reduce using rule 21 (PRINT -> NUMBER DOT .)
+    SEMICOLON       reduce using rule 21 (PRINT -> NUMBER DOT .)
+
+
 state 27
+
+    (23) PRINT -> NUMBER EMIT .
+
+    WORD            reduce using rule 23 (PRINT -> NUMBER EMIT .)
+    NUMBER          reduce using rule 23 (PRINT -> NUMBER EMIT .)
+    PLUS            reduce using rule 23 (PRINT -> NUMBER EMIT .)
+    MINUS           reduce using rule 23 (PRINT -> NUMBER EMIT .)
+    TIMES           reduce using rule 23 (PRINT -> NUMBER EMIT .)
+    DIVIDE          reduce using rule 23 (PRINT -> NUMBER EMIT .)
+    SUP             reduce using rule 23 (PRINT -> NUMBER EMIT .)
+    INF             reduce using rule 23 (PRINT -> NUMBER EMIT .)
+    EQUALS          reduce using rule 23 (PRINT -> NUMBER EMIT .)
+    CR              reduce using rule 23 (PRINT -> NUMBER EMIT .)
+    KEY             reduce using rule 23 (PRINT -> NUMBER EMIT .)
+    DOT             reduce using rule 23 (PRINT -> NUMBER EMIT .)
+    COLON           reduce using rule 23 (PRINT -> NUMBER EMIT .)
+    $end            reduce using rule 23 (PRINT -> NUMBER EMIT .)
+    SEMICOLON       reduce using rule 23 (PRINT -> NUMBER EMIT .)
+
+
+state 28
 
     (24) FUNCTION_DEFINITION -> COLON WORD . LPAREN FUNCTION_PARAMS RPAREN FUNCTION_BODY SEMICOLON
     (32) FUNCTION_DEFINITION -> COLON WORD . PRINTFUNC SEMICOLON
@@ -935,33 +929,11 @@ state 27
     PRINTFUNC                      shift and go to state 35
     operator                       shift and go to state 36
 
-state 28
+state 29
 
     (43) FUNCTION_DEFINITION -> COLON funcword . SEMICOLON
 
     SEMICOLON       shift and go to state 39
-
-
-state 29
-
-    (21) PRINT -> DOT NUMBER .
-
-    WORD            reduce using rule 21 (PRINT -> DOT NUMBER .)
-    NUMBER          reduce using rule 21 (PRINT -> DOT NUMBER .)
-    PLUS            reduce using rule 21 (PRINT -> DOT NUMBER .)
-    MINUS           reduce using rule 21 (PRINT -> DOT NUMBER .)
-    TIMES           reduce using rule 21 (PRINT -> DOT NUMBER .)
-    DIVIDE          reduce using rule 21 (PRINT -> DOT NUMBER .)
-    SUP             reduce using rule 21 (PRINT -> DOT NUMBER .)
-    INF             reduce using rule 21 (PRINT -> DOT NUMBER .)
-    EQUALS          reduce using rule 21 (PRINT -> DOT NUMBER .)
-    CR              reduce using rule 21 (PRINT -> DOT NUMBER .)
-    KEY             reduce using rule 21 (PRINT -> DOT NUMBER .)
-    DOT             reduce using rule 21 (PRINT -> DOT NUMBER .)
-    EMIT            reduce using rule 21 (PRINT -> DOT NUMBER .)
-    COLON           reduce using rule 21 (PRINT -> DOT NUMBER .)
-    $end            reduce using rule 21 (PRINT -> DOT NUMBER .)
-    SEMICOLON       reduce using rule 21 (PRINT -> DOT NUMBER .)
 
 
 state 30
@@ -1000,9 +972,9 @@ state 31
     (45) CARACTER -> . CR
     (46) CARACTER -> . KEY
     (20) PRINT -> . DOT
-    (21) PRINT -> . DOT NUMBER
+    (21) PRINT -> . NUMBER DOT
     (22) PRINT -> . DOT QUOTE words QUOTE
-    (23) PRINT -> . EMIT
+    (23) PRINT -> . NUMBER EMIT
     (8) FUNCTION_DEFINITION -> . CONDICIONAL
     (24) FUNCTION_DEFINITION -> . COLON WORD LPAREN FUNCTION_PARAMS RPAREN FUNCTION_BODY SEMICOLON
     (32) FUNCTION_DEFINITION -> . COLON WORD PRINTFUNC SEMICOLON
@@ -1021,7 +993,6 @@ state 31
   ! shift/reduce conflict for CR resolved as shift
   ! shift/reduce conflict for KEY resolved as shift
   ! shift/reduce conflict for DOT resolved as shift
-  ! shift/reduce conflict for EMIT resolved as shift
   ! shift/reduce conflict for COLON resolved as shift
   ! shift/reduce conflict for WORD resolved as shift
     $end            reduce using rule 4 (instructions -> instructions instruction WORD .)
@@ -1037,7 +1008,6 @@ state 31
     CR              shift and go to state 20
     KEY             shift and go to state 21
     DOT             shift and go to state 22
-    EMIT            shift and go to state 23
     COLON           shift and go to state 12
     WORD            shift and go to state 4
 
@@ -1053,10 +1023,9 @@ state 31
   ! CR              [ reduce using rule 4 (instructions -> instructions instruction WORD .) ]
   ! KEY             [ reduce using rule 4 (instructions -> instructions instruction WORD .) ]
   ! DOT             [ reduce using rule 4 (instructions -> instructions instruction WORD .) ]
-  ! EMIT            [ reduce using rule 4 (instructions -> instructions instruction WORD .) ]
   ! COLON           [ reduce using rule 4 (instructions -> instructions instruction WORD .) ]
 
-    instructions                   shift and go to state 24
+    instructions                   shift and go to state 23
     instruction                    shift and go to state 42
     operator                       shift and go to state 8
     CARACTER                       shift and go to state 9
@@ -1093,9 +1062,9 @@ state 32
     (45) CARACTER -> . CR
     (46) CARACTER -> . KEY
     (20) PRINT -> . DOT
-    (21) PRINT -> . DOT NUMBER
+    (21) PRINT -> . NUMBER DOT
     (22) PRINT -> . DOT QUOTE words QUOTE
-    (23) PRINT -> . EMIT
+    (23) PRINT -> . NUMBER EMIT
     (8) FUNCTION_DEFINITION -> . CONDICIONAL
     (24) FUNCTION_DEFINITION -> . COLON WORD LPAREN FUNCTION_PARAMS RPAREN FUNCTION_BODY SEMICOLON
     (32) FUNCTION_DEFINITION -> . COLON WORD PRINTFUNC SEMICOLON
@@ -1115,11 +1084,10 @@ state 32
   ! shift/reduce conflict for CR resolved as shift
   ! shift/reduce conflict for KEY resolved as shift
   ! shift/reduce conflict for DOT resolved as shift
-  ! shift/reduce conflict for EMIT resolved as shift
   ! shift/reduce conflict for COLON resolved as shift
     $end            reduce using rule 7 (instruction -> instructions WORD instructions .)
     SEMICOLON       reduce using rule 7 (instruction -> instructions WORD instructions .)
-    WORD            shift and go to state 26
+    WORD            shift and go to state 25
     NUMBER          shift and go to state 7
     PLUS            shift and go to state 13
     MINUS           shift and go to state 14
@@ -1131,7 +1099,6 @@ state 32
     CR              shift and go to state 20
     KEY             shift and go to state 21
     DOT             shift and go to state 22
-    EMIT            shift and go to state 23
     COLON           shift and go to state 12
 
   ! WORD            [ reduce using rule 7 (instruction -> instructions WORD instructions .) ]
@@ -1146,11 +1113,10 @@ state 32
   ! CR              [ reduce using rule 7 (instruction -> instructions WORD instructions .) ]
   ! KEY             [ reduce using rule 7 (instruction -> instructions WORD instructions .) ]
   ! DOT             [ reduce using rule 7 (instruction -> instructions WORD instructions .) ]
-  ! EMIT            [ reduce using rule 7 (instruction -> instructions WORD instructions .) ]
   ! COLON           [ reduce using rule 7 (instruction -> instructions WORD instructions .) ]
 
-    instructions                   shift and go to state 24
-    instruction                    shift and go to state 25
+    instructions                   shift and go to state 23
+    instruction                    shift and go to state 24
     operator                       shift and go to state 8
     CARACTER                       shift and go to state 9
     PRINT                          shift and go to state 10
@@ -1230,7 +1196,6 @@ state 39
     CR              reduce using rule 43 (FUNCTION_DEFINITION -> COLON funcword SEMICOLON .)
     KEY             reduce using rule 43 (FUNCTION_DEFINITION -> COLON funcword SEMICOLON .)
     DOT             reduce using rule 43 (FUNCTION_DEFINITION -> COLON funcword SEMICOLON .)
-    EMIT            reduce using rule 43 (FUNCTION_DEFINITION -> COLON funcword SEMICOLON .)
     COLON           reduce using rule 43 (FUNCTION_DEFINITION -> COLON funcword SEMICOLON .)
     $end            reduce using rule 43 (FUNCTION_DEFINITION -> COLON funcword SEMICOLON .)
     SEMICOLON       reduce using rule 43 (FUNCTION_DEFINITION -> COLON funcword SEMICOLON .)
@@ -1271,7 +1236,6 @@ state 42
   ! reduce/reduce conflict for CR resolved using rule 3 (instructions -> instruction .)
   ! reduce/reduce conflict for KEY resolved using rule 3 (instructions -> instruction .)
   ! reduce/reduce conflict for DOT resolved using rule 3 (instructions -> instruction .)
-  ! reduce/reduce conflict for EMIT resolved using rule 3 (instructions -> instruction .)
   ! reduce/reduce conflict for COLON resolved using rule 3 (instructions -> instruction .)
     $end            reduce using rule 5 (instructions -> instructions instruction WORD instruction .)
     SEMICOLON       reduce using rule 5 (instructions -> instructions instruction WORD instruction .)
@@ -1287,7 +1251,6 @@ state 42
     CR              reduce using rule 3 (instructions -> instruction .)
     KEY             reduce using rule 3 (instructions -> instruction .)
     DOT             reduce using rule 3 (instructions -> instruction .)
-    EMIT            reduce using rule 3 (instructions -> instruction .)
     COLON           reduce using rule 3 (instructions -> instruction .)
 
   ! WORD            [ reduce using rule 5 (instructions -> instructions instruction WORD instruction .) ]
@@ -1302,7 +1265,6 @@ state 42
   ! CR              [ reduce using rule 5 (instructions -> instructions instruction WORD instruction .) ]
   ! KEY             [ reduce using rule 5 (instructions -> instructions instruction WORD instruction .) ]
   ! DOT             [ reduce using rule 5 (instructions -> instructions instruction WORD instruction .) ]
-  ! EMIT            [ reduce using rule 5 (instructions -> instructions instruction WORD instruction .) ]
   ! COLON           [ reduce using rule 5 (instructions -> instructions instruction WORD instruction .) ]
 
 
@@ -1373,7 +1335,6 @@ state 48
     CR              reduce using rule 32 (FUNCTION_DEFINITION -> COLON WORD PRINTFUNC SEMICOLON .)
     KEY             reduce using rule 32 (FUNCTION_DEFINITION -> COLON WORD PRINTFUNC SEMICOLON .)
     DOT             reduce using rule 32 (FUNCTION_DEFINITION -> COLON WORD PRINTFUNC SEMICOLON .)
-    EMIT            reduce using rule 32 (FUNCTION_DEFINITION -> COLON WORD PRINTFUNC SEMICOLON .)
     COLON           reduce using rule 32 (FUNCTION_DEFINITION -> COLON WORD PRINTFUNC SEMICOLON .)
     $end            reduce using rule 32 (FUNCTION_DEFINITION -> COLON WORD PRINTFUNC SEMICOLON .)
     SEMICOLON       reduce using rule 32 (FUNCTION_DEFINITION -> COLON WORD PRINTFUNC SEMICOLON .)
@@ -1428,7 +1389,6 @@ state 52
     CR              reduce using rule 22 (PRINT -> DOT QUOTE words QUOTE .)
     KEY             reduce using rule 22 (PRINT -> DOT QUOTE words QUOTE .)
     DOT             reduce using rule 22 (PRINT -> DOT QUOTE words QUOTE .)
-    EMIT            reduce using rule 22 (PRINT -> DOT QUOTE words QUOTE .)
     COLON           reduce using rule 22 (PRINT -> DOT QUOTE words QUOTE .)
     $end            reduce using rule 22 (PRINT -> DOT QUOTE words QUOTE .)
     SEMICOLON       reduce using rule 22 (PRINT -> DOT QUOTE words QUOTE .)
@@ -1479,9 +1439,9 @@ state 54
     (45) CARACTER -> . CR
     (46) CARACTER -> . KEY
     (20) PRINT -> . DOT
-    (21) PRINT -> . DOT NUMBER
+    (21) PRINT -> . NUMBER DOT
     (22) PRINT -> . DOT QUOTE words QUOTE
-    (23) PRINT -> . EMIT
+    (23) PRINT -> . NUMBER EMIT
     (47) CONDICIONAL -> . COLON WORD operator IF part ELSE part THEN SEMICOLON
 
     NUMBER          shift and go to state 7
@@ -1497,7 +1457,6 @@ state 54
     CR              shift and go to state 20
     KEY             shift and go to state 21
     DOT             shift and go to state 22
-    EMIT            shift and go to state 23
 
     FUNCTION_BODY                  shift and go to state 65
     instructions                   shift and go to state 66
@@ -1631,9 +1590,9 @@ state 66
     (45) CARACTER -> . CR
     (46) CARACTER -> . KEY
     (20) PRINT -> . DOT
-    (21) PRINT -> . DOT NUMBER
+    (21) PRINT -> . NUMBER DOT
     (22) PRINT -> . DOT QUOTE words QUOTE
-    (23) PRINT -> . EMIT
+    (23) PRINT -> . NUMBER EMIT
     (8) FUNCTION_DEFINITION -> . CONDICIONAL
     (24) FUNCTION_DEFINITION -> . COLON WORD LPAREN FUNCTION_PARAMS RPAREN FUNCTION_BODY SEMICOLON
     (32) FUNCTION_DEFINITION -> . COLON WORD PRINTFUNC SEMICOLON
@@ -1642,7 +1601,7 @@ state 66
     (47) CONDICIONAL -> . COLON WORD operator IF part ELSE part THEN SEMICOLON
 
     SEMICOLON       reduce using rule 30 (FUNCTION_BODY -> instructions .)
-    WORD            shift and go to state 26
+    WORD            shift and go to state 25
     NUMBER          shift and go to state 7
     PLUS            shift and go to state 13
     MINUS           shift and go to state 14
@@ -1654,11 +1613,10 @@ state 66
     CR              shift and go to state 20
     KEY             shift and go to state 21
     DOT             shift and go to state 22
-    EMIT            shift and go to state 23
     COLON           shift and go to state 12
 
-    instructions                   shift and go to state 24
-    instruction                    shift and go to state 25
+    instructions                   shift and go to state 23
+    instruction                    shift and go to state 24
     operator                       shift and go to state 8
     CARACTER                       shift and go to state 9
     PRINT                          shift and go to state 10
@@ -1684,7 +1642,6 @@ state 67
     CR              reduce using rule 3 (instructions -> instruction .)
     KEY             reduce using rule 3 (instructions -> instruction .)
     DOT             reduce using rule 3 (instructions -> instruction .)
-    EMIT            reduce using rule 3 (instructions -> instruction .)
     COLON           reduce using rule 3 (instructions -> instruction .)
     SEMICOLON       reduce using rule 3 (instructions -> instruction .)
 
@@ -1759,7 +1716,6 @@ state 73
     CR              reduce using rule 24 (FUNCTION_DEFINITION -> COLON WORD LPAREN FUNCTION_PARAMS RPAREN FUNCTION_BODY SEMICOLON .)
     KEY             reduce using rule 24 (FUNCTION_DEFINITION -> COLON WORD LPAREN FUNCTION_PARAMS RPAREN FUNCTION_BODY SEMICOLON .)
     DOT             reduce using rule 24 (FUNCTION_DEFINITION -> COLON WORD LPAREN FUNCTION_PARAMS RPAREN FUNCTION_BODY SEMICOLON .)
-    EMIT            reduce using rule 24 (FUNCTION_DEFINITION -> COLON WORD LPAREN FUNCTION_PARAMS RPAREN FUNCTION_BODY SEMICOLON .)
     COLON           reduce using rule 24 (FUNCTION_DEFINITION -> COLON WORD LPAREN FUNCTION_PARAMS RPAREN FUNCTION_BODY SEMICOLON .)
     $end            reduce using rule 24 (FUNCTION_DEFINITION -> COLON WORD LPAREN FUNCTION_PARAMS RPAREN FUNCTION_BODY SEMICOLON .)
     SEMICOLON       reduce using rule 24 (FUNCTION_DEFINITION -> COLON WORD LPAREN FUNCTION_PARAMS RPAREN FUNCTION_BODY SEMICOLON .)
@@ -1828,7 +1784,6 @@ state 80
     CR              reduce using rule 47 (CONDICIONAL -> COLON WORD operator IF part ELSE part THEN SEMICOLON .)
     KEY             reduce using rule 47 (CONDICIONAL -> COLON WORD operator IF part ELSE part THEN SEMICOLON .)
     DOT             reduce using rule 47 (CONDICIONAL -> COLON WORD operator IF part ELSE part THEN SEMICOLON .)
-    EMIT            reduce using rule 47 (CONDICIONAL -> COLON WORD operator IF part ELSE part THEN SEMICOLON .)
     COLON           reduce using rule 47 (CONDICIONAL -> COLON WORD operator IF part ELSE part THEN SEMICOLON .)
     $end            reduce using rule 47 (CONDICIONAL -> COLON WORD operator IF part ELSE part THEN SEMICOLON .)
     SEMICOLON       reduce using rule 47 (CONDICIONAL -> COLON WORD operator IF part ELSE part THEN SEMICOLON .)
@@ -1836,23 +1791,22 @@ state 80
 WARNING: 
 WARNING: Conflicts:
 WARNING: 
-WARNING: shift/reduce conflict for NUMBER in state 22 resolved as shift
+WARNING: shift/reduce conflict for DOT in state 7 resolved as shift
+WARNING: shift/reduce conflict for WORD in state 24 resolved as shift
+WARNING: shift/reduce conflict for WORD in state 24 resolved as shift
+WARNING: shift/reduce conflict for NUMBER in state 25 resolved as shift
+WARNING: shift/reduce conflict for COLON in state 25 resolved as shift
 WARNING: shift/reduce conflict for WORD in state 25 resolved as shift
-WARNING: shift/reduce conflict for WORD in state 25 resolved as shift
-WARNING: shift/reduce conflict for NUMBER in state 26 resolved as shift
-WARNING: shift/reduce conflict for COLON in state 26 resolved as shift
-WARNING: shift/reduce conflict for WORD in state 26 resolved as shift
-WARNING: shift/reduce conflict for PLUS in state 26 resolved as shift
-WARNING: shift/reduce conflict for MINUS in state 26 resolved as shift
-WARNING: shift/reduce conflict for TIMES in state 26 resolved as shift
-WARNING: shift/reduce conflict for DIVIDE in state 26 resolved as shift
-WARNING: shift/reduce conflict for SUP in state 26 resolved as shift
-WARNING: shift/reduce conflict for INF in state 26 resolved as shift
-WARNING: shift/reduce conflict for EQUALS in state 26 resolved as shift
-WARNING: shift/reduce conflict for CR in state 26 resolved as shift
-WARNING: shift/reduce conflict for KEY in state 26 resolved as shift
-WARNING: shift/reduce conflict for DOT in state 26 resolved as shift
-WARNING: shift/reduce conflict for EMIT in state 26 resolved as shift
+WARNING: shift/reduce conflict for PLUS in state 25 resolved as shift
+WARNING: shift/reduce conflict for MINUS in state 25 resolved as shift
+WARNING: shift/reduce conflict for TIMES in state 25 resolved as shift
+WARNING: shift/reduce conflict for DIVIDE in state 25 resolved as shift
+WARNING: shift/reduce conflict for SUP in state 25 resolved as shift
+WARNING: shift/reduce conflict for INF in state 25 resolved as shift
+WARNING: shift/reduce conflict for EQUALS in state 25 resolved as shift
+WARNING: shift/reduce conflict for CR in state 25 resolved as shift
+WARNING: shift/reduce conflict for KEY in state 25 resolved as shift
+WARNING: shift/reduce conflict for DOT in state 25 resolved as shift
 WARNING: shift/reduce conflict for NUMBER in state 31 resolved as shift
 WARNING: shift/reduce conflict for PLUS in state 31 resolved as shift
 WARNING: shift/reduce conflict for MINUS in state 31 resolved as shift
@@ -1864,7 +1818,6 @@ WARNING: shift/reduce conflict for EQUALS in state 31 resolved as shift
 WARNING: shift/reduce conflict for CR in state 31 resolved as shift
 WARNING: shift/reduce conflict for KEY in state 31 resolved as shift
 WARNING: shift/reduce conflict for DOT in state 31 resolved as shift
-WARNING: shift/reduce conflict for EMIT in state 31 resolved as shift
 WARNING: shift/reduce conflict for COLON in state 31 resolved as shift
 WARNING: shift/reduce conflict for WORD in state 31 resolved as shift
 WARNING: shift/reduce conflict for WORD in state 32 resolved as shift
@@ -1879,11 +1832,10 @@ WARNING: shift/reduce conflict for EQUALS in state 32 resolved as shift
 WARNING: shift/reduce conflict for CR in state 32 resolved as shift
 WARNING: shift/reduce conflict for KEY in state 32 resolved as shift
 WARNING: shift/reduce conflict for DOT in state 32 resolved as shift
-WARNING: shift/reduce conflict for EMIT in state 32 resolved as shift
 WARNING: shift/reduce conflict for COLON in state 32 resolved as shift
 WARNING: shift/reduce conflict for WORD in state 56 resolved as shift
-WARNING: reduce/reduce conflict in state 25 resolved using rule (instructions -> instructions instruction)
-WARNING: rejected rule (instructions -> instruction) in state 25
+WARNING: reduce/reduce conflict in state 24 resolved using rule (instructions -> instructions instruction)
+WARNING: rejected rule (instructions -> instruction) in state 24
 WARNING: reduce/reduce conflict in state 42 resolved using rule (instructions -> instruction)
 WARNING: rejected rule (instructions -> instructions instruction WORD instruction) in state 42
 WARNING: reduce/reduce conflict in state 67 resolved using rule (instructions -> instruction)

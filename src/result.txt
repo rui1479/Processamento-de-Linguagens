@@ -1,0 +1,4 @@
+start
+pushi123
+writei
+stop

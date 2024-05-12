@@ -347,13 +347,13 @@ def p_print(p):
     p[0] = p[1]
 
 def p_print_num(p):
-    'PRINT : NUMBER DOT'
-    p[0] = "start\npushi" + str(p[1]) + "\nwritei\nstop\n"
+    'PRINT :  DOT NUMBER'
+    p[0] = "start\npushi" + str(p[2]) + "\nwritei\nstop\n"
 
 
 def p_print_string(p):
-    'PRINT : DOT QUOTE WORD QUOTE'
-    p[0] = "start\npushs " + p[3] + "\nwrites\nstop\n"
+    'PRINT : DOT QUOTE words QUOTE'
+    p[0] = "start\npushs\"" + p[3] + "\"\nwrites\nstop\n"
 
 
 def p_print_emit(p):

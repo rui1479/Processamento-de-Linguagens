@@ -93,6 +93,10 @@ def p_instructions1(p):
             instruction += "sub\n"
         elif p[2] == '*':
             instruction += "mul\n"
+        elif p[2] == '%':
+            if p[1] == 0:
+                raise ZeroDivisionError("Division by zero!")
+            instruction += "mod\n"
         elif p[2] == '/':
             if p[1] == 0:
                 raise ZeroDivisionError("Division by zero!")
@@ -159,6 +163,10 @@ def p_instructions3(p):
             instruction += "inf\n"
         elif p[1] == '>':
             instruction += "sup\n"
+        elif p[1] == '%':
+            if p[2] == 0:
+                raise ZeroDivisionError("Division by zero!")
+            instruction += "mod\n"
         elif p[1] == '/':
             if p[2] == 0:
                 raise ZeroDivisionError("Division by zero!")
@@ -224,6 +232,10 @@ def p_instructions7(p):
             instruction += "inf\n"
         elif p[1] == '>':
             instruction += "sup\n"
+        elif p[1] == '%':
+            if p[2] == 0:
+                raise ZeroDivisionError("Division by zero!")
+            instruction += "mod\n"
         elif p[1] == '/':
             if p[2] == 0:
                 raise ZeroDivisionError("Division by zero!")
@@ -281,6 +293,10 @@ def p_instructions5(p):
         instruction += "sub\n"
     elif p[3][0] == '*':
         instruction += "mul\n"
+    elif p[3][0] == '%':
+        if p[2] == 0:
+            raise ZeroDivisionError("Division by zero!")
+        instruction += "mod\n"
     elif p[3][0] == '/':
         if p[2] == 0:
             raise ZeroDivisionError("Division by zero!")
@@ -325,6 +341,7 @@ def p_operator(p):
                 | MINUS
                 | TIMES
                 | DIVIDE
+                | MOD
                 | SUP
                 | INF
                 | EQUALS'''
@@ -420,6 +437,8 @@ def p_function_body1(p):
                     operator = 'sub'
                 elif operator == '*':
                     operator = 'mul'
+                elif operator == '%':
+                    operator = 'mod'
                 elif operator == '/':
                     operator = 'div'
                 params_list.append(operator + '\n' + instr[1:])
@@ -436,6 +455,8 @@ def p_function_body1(p):
                 operator = 'sub'
             elif operator == '*':
                 operator = 'mul'
+            elif operator == '%':
+                operator = 'mod'
             elif operator == '/':
                 operator = 'div'
             params_list.append(operator + '\n' + p[1][1:])

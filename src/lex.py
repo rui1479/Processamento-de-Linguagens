@@ -7,6 +7,7 @@ tokens = (
     'PLUS',
     'MINUS',
     'TIMES',
+    'MOD',
     'DIVIDE',
     'LPAREN',
     'RPAREN',
@@ -35,6 +36,7 @@ t_RPAREN = r'\)'
 t_TIMES = r'\*'
 t_DIVIDE = r'/'
 t_PLUS = r'\+'
+t_MOD = r'%'
 t_COLON = r':'
 t_SEMICOLON = r';'
 t_DOT = r'\.'

@@ -1,7 +1,0 @@
-start
-pushi123
-writei
-stop
-start
-.pushi 123
-stop
